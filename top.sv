@@ -29,7 +29,9 @@ module top (
 	output logic enable8,
 	output logic interrupt9,
 	output logic ack10,
-	output logic req10
+	output logic req10,
+	output logic help1_o,
+	output logic help4
 ) ;
 	z1 my_module
 	  (
@@ -63,14 +65,74 @@ module top (
 	   .enable8(enable8),
 	   .interrupt9(interrupt9),
 	   .ack10(ack10),
-	   .req10(req10)
+	   .req10(req10),
+	   .help1_o(help1_o),
+	   .help4(help4)
 	   
 	   );
 
+default clocking @(posedge clk); endclocking
+default disable iff (rst);
+
 	property p1;
-		@(posedge clk) (!rdy1 && !start1 && !endd1) throughout !rt1[->1];
+		  help1_o;
+	endproperty
+
+	property p2;
+		  er2[*3] |=> !er2;
+	endproperty
+
+	property p3;
+		  er3 && rdy3 |=> !er3 || !rdy3;
+	endproperty
+
+	property p4;
+		  !help4;
+	endproperty	
+
+	property p5;
+		  endd5 || stop5 || er5 |=> !rdy5;
+	endproperty
+
+	property p6;
+		  endd6 || stop6 || er6 |-> rdy6;
+	endproperty
+
+	property p7;
+		  endd7 |-> !(start7 || status_valid7);
+	endproperty
+
+	property p8_1;
+		  rt8 |-> !enable8;
+	endproperty
+		  
+	property p8_2;
+		  $fell(rt8) |=> enable8[*];
+	endproperty
+
+	property p9_1;
+		  $fell(start9) |-> interrupt9;
+	endproperty
+		  
+	property p9_2;
+		  $fell(rdy9) |-> interrupt9;
+	endproperty
+
+	property p10;
+		  req10 |-> ##5 ack10;
 	endproperty
 
 	assert property (p1);
+	assert property (p2);
+	assert property (p3);
+	assert property (p4); // dodaj sa registrima
+	assert property (p5);
+	assert property (p6);
+	assert property (p7);
+	assert property (p8_1);
+	assert property (p8_2);
+	assert property (p9_1);	
+	assert property (p9_2);
+	assert property (p10);
 
 endmodule

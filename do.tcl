@@ -1,4 +1,4 @@
-analyze -vhdl2k z1.vhd
+analyze -vhdl z1.vhd
 analyze -sv09 top.sv
 elaborate -top {top}
 clock clk
